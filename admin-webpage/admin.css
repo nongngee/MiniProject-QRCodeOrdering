@@ -1,0 +1,174 @@
+/* ===================================================
+   admin.css — ลาวอ้องท้อง | Admin styles
+   =================================================== */
+
+/* ===== Variables ===== */
+:root {
+  --color-bg:       #FAF6EE;
+  --color-primary:  #7A1A1A;
+  --color-dark:     #5A0E0E;
+  --color-accent:   #C25A1A;
+  --color-surface:  #FFFFFF;
+  --color-border:   #D3D1C7;
+  --color-text:     #2C2C2A;
+  --color-muted:    #888780;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+
+  --font-main: 'Sarabun', sans-serif;
+}
+
+/* ===== Reset ===== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ===== Screen container ===== */
+.screen {
+  width: 100%;
+  max-width: 430px;
+  min-height: 100dvh;
+  background-color: var(--color-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 32px 40px;
+}
+
+/* ===== Logo ===== */
+.logo-wrap {
+  margin-bottom: 12px;
+}
+
+.logo-wrap svg {
+  width: 96px;
+  height: 96px;
+}
+
+/* ===== Brand name ===== */
+.brand-th {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: 1px;
+  text-align: center;
+  margin-bottom: 2px;
+}
+
+.brand-en {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--color-primary);
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+/* ===== Login heading ===== */
+.login-heading {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-primary);
+  text-align: center;
+  margin-bottom: 2px;
+}
+
+.login-sub {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--color-muted);
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+/* ===== Form ===== */
+.form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.input-field {
+  width: 100%;
+  height: 48px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0 16px;
+  font-size: 16px;
+  font-family: var(--font-main);
+  color: var(--color-text);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.input-field::placeholder {
+  color: var(--color-muted);
+}
+
+.input-field:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(194, 90, 26, 0.15);
+}
+
+/* ===== Button ===== */
+.btn-login {
+  width: 100%;
+  height: 48px;
+  margin-top: 4px;
+  background: var(--color-primary);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  font-family: var(--font-main);
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.btn-login:hover {
+  background: var(--color-dark);
+}
+
+.btn-login:active {
+  transform: scale(0.98);
+}
+
+/* ===== Footer link ===== */
+.footer-text {
+  margin-top: 20px;
+  font-size: 12px;
+  color: var(--color-muted);
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+.footer-text a {
+  color: var(--color-accent);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.footer-text a:hover {
+  text-decoration: underline;
+}
