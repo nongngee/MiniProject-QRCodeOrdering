@@ -1,3 +1,7 @@
 ลิ้งค์สำหรับแอดมิน
 
 https://lowaoytoyadmin.netlify.app/
+
+รหัส
+admin
+123
