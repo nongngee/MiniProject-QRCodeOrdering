@@ -1,5 +1,5 @@
 /* ===================================================
-   admin.css — ลาวอ้องท้อง | Admin styles
+   admin.css — ลาวอ้อยต้อย | Admin styles - log in
    =================================================== */
 
 /* ===== Variables ===== */
@@ -78,7 +78,7 @@ body {
   letter-spacing: 3px;
   color: var(--color-primary);
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 15px;
 }
 
 /* ===== Login heading ===== */
@@ -172,3 +172,113 @@ body {
 .footer-text a:hover {
   text-decoration: underline;
 }
+
+
+
+/* ===================================================
+   admin.css — ลาวอ้อยต้อย | Admin styles - Home
+   =================================================== */
+   /* ===== Header ===== */
+.dashboard-header {
+  width: 100%;
+  max-width: 430px;
+  background-color: var(--color-primary);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+}
+.dashboard-header h1 {
+  padding-right: 130px;
+  padding-bottom: 5px;
+  color: var(--color-bg);
+}
+ 
+.header-logo {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+}
+ 
+.btn-logout {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.5);
+  color: #FFFFFF;
+  font-family: var(--font-main);
+  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+ 
+.btn-logout:hover {
+  background: rgba(255,255,255,0.15);
+}
+ 
+/* ===== Dashboard screen override ===== */
+.screen:has(.dashboard-header) {
+  padding: 0;
+  justify-content: flex-start;
+}
+ 
+/* ===== Grid ===== */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  padding: 40px 32px;
+  width: 100%;
+}
+ 
+/* ===== Card ===== */
+.dashboard-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 28px 16px;
+  text-decoration: none;
+  color: var(--color-text);
+  transition: border-color 0.15s, transform 0.1s;
+  aspect-ratio: 1 / 1;
+}
+ 
+.dashboard-card:hover {
+  border-color: var(--color-accent);
+}
+ 
+.dashboard-card:active {
+  transform: scale(0.97);
+}
+ 
+.card-icon {
+  width: 52px;
+  height: 52px;
+  color: var(--color-primary);
+}
+ 
+.card-icon svg {
+  width: 100%;
+  height: 100%;
+}
+ 
+.card-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--color-text);
+  text-align: center;
+}
+
+
+/* ===================================================
+   admin.css — ลาวอ้อยต้อย | Admin styles - Edit Menu
+   =================================================== */
+   
