@@ -5,7 +5,7 @@
 
 // ===== ส่วนที่ 1 — กำหนด credentials =====
 const ADMIN_USER = "admin";
-const ADMIN_PASS = "lat123";
+const ADMIN_PASS = "123";
 
 
 // ===== ส่วนที่ 2 — จัดการ login =====

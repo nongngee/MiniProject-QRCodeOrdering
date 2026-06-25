@@ -1,17 +1,17 @@
 /* ===================================================
-   admin.css — ลาวอ้อยต้อย | Admin styles - log in
+   admin.css — ลาวอ้อยต้อย | Admin styles
    =================================================== */
 
 /* ===== Variables ===== */
 :root {
-  --color-bg:       #FAF6EE;
-  --color-primary:  #7A1A1A;
-  --color-dark:     #5A0E0E;
-  --color-accent:   #C25A1A;
-  --color-surface:  #FFFFFF;
-  --color-border:   #D3D1C7;
-  --color-text:     #2C2C2A;
-  --color-muted:    #888780;
+  --color-bg:      #FAF6EE;
+  --color-primary: #7A1A1A;
+  --color-dark:    #5A0E0E;
+  --color-accent:  #C25A1A;
+  --color-surface: #FFFFFF;
+  --color-border:  #D3D1C7;
+  --color-text:    #2C2C2A;
+  --color-muted:   #888780;
 
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -27,25 +27,36 @@
 }
 
 html {
-  font-size: 16px;
+  font-size: 14px;
 }
 
+@media (min-width: 768px) {
+  html { font-size: 16px; }
+}
+
+@media (min-width: 1024px) {
+  html { font-size: 18px; }
+}
+
+/* ===== Base body ===== */
 body {
   font-family: var(--font-main);
   background-color: var(--color-bg);
   color: var(--color-text);
   min-height: 100dvh;
+  width: 100%;
+  margin: 0 auto;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
 }
 
-/* ===== Screen container ===== */
-.screen {
-  width: 100%;
-  max-width: 430px;
-  min-height: 100dvh;
-  background-color: var(--color-bg);
+
+/* ===================================================
+   Login page
+   =================================================== */
+
+.login-wrap {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -58,9 +69,11 @@ body {
   margin-bottom: 12px;
 }
 
+.logo-wrap img,
 .logo-wrap svg {
   width: 96px;
   height: 96px;
+  object-fit: contain;
 }
 
 /* ===== Brand name ===== */
@@ -100,7 +113,9 @@ body {
 
 /* ===== Form ===== */
 .form {
-  width: 100%;
+  width: 100%;            /* บนมือถือให้ยืดเต็มความกว้าง */
+  max-width: 400px;       /* บล็อกไม่ให้กล่องฟอร์มยืดกว้างเกินไปเมื่ออยู่บนจอคอม/แท็บเล็ต */
+  margin: 0 auto;         /* จัดให้กลุ่มฟอร์มทั้งหมดอยู่ตรงกลางหน้าจอ */
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -129,7 +144,7 @@ body {
   box-shadow: 0 0 0 3px rgba(194, 90, 26, 0.15);
 }
 
-/* ===== Button ===== */
+/* ===== Login button ===== */
 .btn-login {
   width: 100%;
   height: 48px;
@@ -146,13 +161,8 @@ body {
   transition: background 0.15s, transform 0.1s;
 }
 
-.btn-login:hover {
-  background: var(--color-dark);
-}
-
-.btn-login:active {
-  transform: scale(0.98);
-}
+.btn-login:hover  { background: var(--color-dark); }
+.btn-login:active { transform: scale(0.98); }
 
 /* ===== Footer link ===== */
 .footer-text {
@@ -176,12 +186,12 @@ body {
 
 
 /* ===================================================
-   admin.css — ลาวอ้อยต้อย | Admin styles - Home
+   Dashboard / Home page
    =================================================== */
-   /* ===== Header ===== */
+
+/* ===== Header ===== */
 .dashboard-header {
   width: 100%;
-  max-width: 430px;
   background-color: var(--color-primary);
   padding: 16px 24px;
   display: flex;
@@ -189,22 +199,31 @@ body {
   justify-content: space-between;
   position: sticky;
   top: 0;
+  z-index: 10;
 }
-.dashboard-header h1 {
-  padding-right: 130px;
-  padding-bottom: 5px;
+
+.header-brand-group {
+  display: flex;
+  align-items: center;
+  gap: 25px;
   color: var(--color-bg);
 }
- 
+.header-brand-group h1 {
+  font-size: 20px;
+  background-color: #6d1c1c;
+  border-radius: 10px;
+  padding: 5px 15px;
+}
+
 .header-logo {
   height: 48px;
   width: auto;
   object-fit: contain;
 }
- 
+
 .btn-logout {
   background: transparent;
-  border: 1px solid rgba(255,255,255,0.5);
+  border: 1px solid rgba(255, 255, 255, 0.5);
   color: #FFFFFF;
   font-family: var(--font-main);
   font-size: 12px;
@@ -213,26 +232,32 @@ body {
   cursor: pointer;
   transition: background 0.15s;
 }
- 
+
 .btn-logout:hover {
-  background: rgba(255,255,255,0.15);
+  background: rgba(255, 255, 255, 0.15);
 }
- 
-/* ===== Dashboard screen override ===== */
-.screen:has(.dashboard-header) {
-  padding: 0;
-  justify-content: flex-start;
-}
- 
+
 /* ===== Grid ===== */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, 1fr); /* บนมือถือแสดง 2 คอลัมน์ตามรูปแรก */
   gap: 20px;
-  padding: 40px 32px;
-  width: 100%;
+  padding: 32px 24px 40px;
+  width: 100%;       /* สไตล์เริ่มต้น: บนมือถือให้ขยายเต็มความกว้าง */
+  max-width: 450px;  /* บล็อกไม่ให้ใหญ่เกินไปเวลามือถือจอกว้าง */
+  margin: 0 auto;    /* จัดให้อยู่ตรงกลางหน้าจอ */
 }
- 
+
+/* ตั้งค่าสเกลเพิ่มเติมเมื่อเปิดบน แท็บเล็ต หรือ โน้ตบุ๊ก/คอมพิวเตอร์ */
+@media (min-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(3, 1fr); /* บนไอแพด/คอม เปลี่ยนเป็น 3 คอลัมน์ให้ดูเต็มขึ้น */
+    max-width: 800px;  /* ขยายขนาดความกว้างของกลุ่มสี่เหลี่ยมให้สมส่วนกับจอใหญ่ */
+    gap: 30px;         /* เพิ่มระยะห่างระหว่างปุ่มให้ดูโปร่งสบายตา */
+    padding: 60px 24px;
+  }
+}
+
 /* ===== Card ===== */
 .dashboard-card {
   background: var(--color-surface);
@@ -249,26 +274,21 @@ body {
   transition: border-color 0.15s, transform 0.1s;
   aspect-ratio: 1 / 1;
 }
- 
-.dashboard-card:hover {
-  border-color: var(--color-accent);
-}
- 
-.dashboard-card:active {
-  transform: scale(0.97);
-}
- 
+
+.dashboard-card:hover  { border-color: var(--color-accent); }
+.dashboard-card:active { transform: scale(0.97); }
+
 .card-icon {
   width: 52px;
   height: 52px;
   color: var(--color-primary);
 }
- 
+
 .card-icon svg {
   width: 100%;
   height: 100%;
 }
- 
+
 .card-label {
   font-size: 12px;
   font-weight: 700;
@@ -279,6 +299,6 @@ body {
 
 
 /* ===================================================
-   admin.css — ลาวอ้อยต้อย | Admin styles - Edit Menu
+   Edit Menu page
    =================================================== */
    
