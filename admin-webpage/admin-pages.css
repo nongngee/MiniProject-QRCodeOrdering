@@ -1,0 +1,701 @@
+/* ===================================================
+   admin-pages.css — ลาวอ้อยต้อย | Admin sub-page styles
+   ใช้กับ: แก้ไขเมนู, ดูรายการอาหาร, สถานะโต๊ะ, เช็คบิล
+   
+   *** ต้องโหลด admin.css ก่อนไฟล์นี้เสมอ ***
+   เพราะใช้ CSS variables จาก :root ใน admin.css
+   =================================================== */
+
+
+/* ===================================================
+   Shared Header — ทุกหน้ารอง (ยกเว้น login / home)
+   =================================================== */
+
+.menu-header {
+  gap: 15px;
+  width: 100%;
+  height: 80px;
+  background-color: var(--color-primary);
+  padding: 0px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+ 
+.btn-back {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: var(--radius-sm, 8px);
+  color: #fff;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 5px 10px;
+  flex-shrink: 0;
+
+  /* ทำให้เป็นกรอบสี่เหลี่ยม + จัดลูกศรกลางกรอบ */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-back:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+ 
+.header-title {
+  flex: 1;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+
+/* ===================================================
+   หน้า: แก้ไขเมนู (Edit Menu) — Responsive
+   =================================================== */
+
+/* === Content wrapper === */
+.edit-menu-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 16px;
+}
+
+/* === Empty state — กล่องรูปบวก === */
+.empty-state {
+  width: 100%;
+  max-width: 320px;
+  border: 2px dashed var(--color-primary);
+  border-radius: var(--radius-md);
+  padding: 60px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.empty-state:hover {
+  background: rgba(122, 26, 26, 0.04);
+  border-color: var(--color-dark);
+}
+
+.empty-state:active {
+  transform: scale(0.98);
+}
+
+.empty-state-icon {
+  width: 56px;
+  height: 56px;
+  color: var(--color-primary);
+}
+
+.empty-state-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.empty-state-label {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+.empty-state-sub {
+  font-size: 13px;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+/* === Form wrapper === */
+.add-form-wrap {
+  display: none;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 24px 0 40px;
+}
+
+.form-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* === Desktop: image + fields side by side === */
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+@media (min-width: 600px) {
+  .form-grid {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+  .form-image-col {
+    width: 220px;
+    flex-shrink: 0;
+  }
+  .form-fields-col {
+    flex: 1;
+  }
+}
+
+/* === Image upload === */
+.form-image-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.image-upload {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  color: var(--color-muted);
+  overflow: hidden;
+  background: #fafafa;
+}
+
+.image-upload:hover {
+  border-color: var(--color-primary);
+  background: rgba(122, 26, 26, 0.04);
+  color: var(--color-primary);
+}
+
+@media (min-width: 600px) {
+  .image-upload {
+    aspect-ratio: auto;
+    height: 160px;
+  }
+}
+
+.image-upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.image-upload-icon {
+  width: 36px;
+  height: 36px;
+}
+
+.image-upload-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.image-upload-label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.image-upload-hint {
+  font-size: 11px;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+.image-preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+.image-remove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,0.55);
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: background 0.15s;
+}
+
+.image-remove:hover {
+  background: rgba(0,0,0,0.8);
+}
+
+/* === Form fields === */
+.form-fields-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: 0.3px;
+}
+
+.form-input {
+  width: 100%;
+  height: 44px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0 14px;
+  font-size: 15px;
+  font-family: var(--font-main);
+  color: var(--color-text);
+  outline: none;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+}
+
+.form-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(122, 26, 26, 0.08);
+}
+
+.form-input::placeholder {
+  color: var(--color-muted);
+}
+
+/* === Price input with ฿ prefix === */
+.price-wrap {
+  position: relative;
+}
+
+.price-prefix {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-muted);
+  pointer-events: none;
+}
+
+.price-wrap .form-input {
+  padding-left: 32px;
+}
+
+/* === Options section === */
+.options-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 4px;
+  border-top: 1px solid var(--color-border);
+}
+
+#options-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.option-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.option-name {
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0 12px;
+  font-size: 14px;
+  font-family: var(--font-main);
+  color: var(--color-text);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.option-name:focus {
+  border-color: var(--color-primary);
+}
+
+.option-price-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.option-price {
+  width: 80px;
+  height: 40px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0 12px 0 22px;
+  font-size: 14px;
+  font-family: var(--font-main);
+  color: var(--color-text);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.option-price:focus {
+  border-color: var(--color-primary);
+}
+
+.option-price-wrap .currency {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  color: var(--color-muted);
+  pointer-events: none;
+}
+
+.option-remove {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-muted);
+  transition: color 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+
+.option-remove:hover {
+  color: var(--color-primary);
+  background: rgba(122, 26, 26, 0.06);
+}
+
+.btn-add-option {
+  height: 36px;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-main);
+  color: var(--color-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.btn-add-option:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* === Form action buttons === */
+.form-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-save {
+  flex: 1;
+  height: 46px;
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 700;
+  font-family: var(--font-main);
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  letter-spacing: 1px;
+}
+
+.btn-save:hover {
+  background: var(--color-dark);
+}
+
+.btn-save:active {
+  transform: scale(0.98);
+}
+
+.btn-cancel {
+  flex: 1;
+  height: 46px;
+  background: transparent;
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 600;
+  font-family: var(--font-main);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.btn-cancel:hover {
+  border-color: var(--color-muted);
+  color: var(--color-muted);
+}
+
+@media (min-width: 600px) {
+  .form-actions {
+    max-width: 600px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .btn-save {
+    flex: 0 1 160px;
+  }
+  .btn-cancel {
+    flex: 0 1 160px;
+  }
+}
+
+
+/* ===================================================
+   หน้า: ดูรายการอาหาร (Orders)
+   =================================================== */
+/* TODO: เพิ่ม styles สำหรับรายการออเดอร์, status badges */
+
+
+/* ===================================================
+   หน้า: แก้ไขเมนู — รายการเมนูที่บันทึกแล้ว
+   =================================================== */
+
+#menu-list {
+  display: none;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 24px 0 40px;
+}
+
+.menu-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.menu-list-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.btn-add-menu {
+  height: 36px;
+  padding: 0 16px;
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--font-main);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.btn-add-menu:hover {
+  background: var(--color-dark);
+}
+
+#menu-list-items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.menu-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.menu-card-inner {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 600px) {
+  .menu-card-inner {
+    flex-direction: row;
+  }
+}
+
+.menu-card-img-wrap {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #f5f5f5;
+  flex-shrink: 0;
+}
+
+@media (min-width: 600px) {
+  .menu-card-img-wrap {
+    width: 180px;
+    aspect-ratio: auto;
+    min-height: 120px;
+  }
+}
+
+.menu-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.menu-card-content {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.menu-card-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.menu-card-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.menu-card-price {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-accent);
+  white-space: nowrap;
+}
+
+.menu-card-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.menu-opt-heading {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: 0.3px;
+}
+
+.menu-opt-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.menu-opt-badge {
+  font-size: 11px;
+  background: rgba(194, 90, 26, 0.1);
+  color: var(--color-accent);
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+.menu-card-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  padding: 8px 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+.menu-btn-dlt {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 6px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-main);
+  color: var(--color-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.menu-btn-dlt:hover {
+  color: #A32D2D;
+  border-color: #A32D2D;
+  background: rgba(163, 45, 45, 0.06);
+}
+
+.demo-link {
+  cursor: pointer;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.demo-link:hover {
+  opacity: 0.7;
+}
+
+
+/* ===================================================
+   หน้า: สถานะโต๊ะ (Table Status)
+   =================================================== */
+/* TODO: เพิ่ม styles สำหรับผังโต๊ะ, indicator สถานะ */
+
+
+/* ===================================================
+   หน้า: เช็คบิลลูกค้า (Check Bill)
+   =================================================== */
+/* TODO: เพิ่ม styles สำหรับรายการบิล, ยอดรวม, ปุ่มชำระเงิน */

@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="admin.css">
+  <link rel="stylesheet" href="admin-pages.css">
   <link rel="icon" type="image/png" href="assets/favicon.png">
 </head>
 <body>
@@ -14,11 +15,147 @@
   <!-- ===== Header ===== -->
   <header class="menu-header">
     <button class="btn-back" onclick="handleBack()"><</button>
-    <span class="header-title" id="header-title">Edit by Admin</span>
+    <span class="header-title">EDIT MENU</span>
   </header>
 
+  <!-- ===== Page wrapper ===== -->
+  <div class="edit-menu-wrap">
 
+    <!-- ===== State 1 — Empty state ===== -->
+    <div class="empty-state">
+      <div class="empty-state-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+      </div>
+      <span class="empty-state-label">เพิ่มเมนูแรก</span>
+      <span class="empty-state-sub">แตะเพื่อเริ่มเพิ่มเมนูอาหาร</span>
+    </div>
+
+    <!-- ===== State 2 — Form เพิ่มเมนู ===== -->
+    <div class="add-form-wrap">
+
+      <div class="form-card">
+
+        <!-- Desktop: image + fields side by side -->
+        <div class="form-grid">
+
+          <!-- Image upload -->
+          <div class="form-image-col">
+            <div class="image-upload" id="image-preview" onclick="document.getElementById('file-input').click()">
+              <div class="image-upload-placeholder" id="image-placeholder">
+                <div class="image-upload-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                    <polyline points="21 15 16 10 5 21"/>
+                  </svg>
+                </div>
+                <span class="image-upload-label">เพิ่มรูปภาพ</span>
+              </div>
+              <img id="image-preview-img" class="image-preview-img" style="display:none" alt="preview">
+              <button type="button" class="image-remove" id="image-remove-btn" style="display:none" onclick="removeImage(event)">✕</button>
+            </div>
+            <input type="file" id="file-input" accept="image/*" style="display:none" onchange="handleImageUpload(event)">
+            <span class="image-upload-hint">แตะเพื่อเลือกรูป (16:9)</span>
+          </div>
+
+          <!-- Fields column -->
+          <div class="form-fields-col">
+
+            <!-- Menu name -->
+            <div class="form-group">
+              <label class="form-label" for="menu-name">ชื่อเมนู</label>
+              <input
+                class="form-input"
+                type="text"
+                id="menu-name"
+                placeholder="เช่น ข้าวผัดกระเพราไก่"
+              />
+            </div>
+
+            <!-- Price -->
+            <div class="form-group">
+              <label class="form-label" for="menu-price">ราคา</label>
+              <div class="price-wrap">
+                <span class="price-prefix">฿</span>
+                <input
+                  class="form-input"
+                  type="number"
+                  id="menu-price"
+                  placeholder="0"
+                  min="0"
+                />
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Options section -->
+        <div class="options-section">
+          <div class="form-group">
+            <label class="form-label" for="options-heading">หัวข้อตัวเลือก</label>
+            <input
+              class="form-input"
+              type="text"
+              id="options-heading"
+              placeholder="เช่น ตัวเลือกเพิ่มเติม, เพิ่มเติม"
+              value="ตัวเลือกเพิ่มเติม"
+            />
+          </div>
+
+          <div id="options-container">
+
+            <div class="option-row">
+              <input class="option-name" type="text" placeholder="เช่น เพิ่มไข่" value="เพิ่มไข่"/>
+              <div class="option-price-wrap">
+                <span class="currency">฿</span>
+                <input class="option-price" type="number" placeholder="0" value="10" min="0"/>
+              </div>
+              <button class="option-remove" onclick="removeOptionRow(this)" type="button">✕</button>
+            </div>
+
+            <div class="option-row">
+              <input class="option-name" type="text" placeholder="เช่น เพิ่มชีส" value="เพิ่มชีส"/>
+              <div class="option-price-wrap">
+                <span class="currency">฿</span>
+                <input class="option-price" type="number" placeholder="0" value="20" min="0"/>
+              </div>
+              <button class="option-remove" onclick="removeOptionRow(this)" type="button">✕</button>
+            </div>
+
+          </div>
+
+          <button class="btn-add-option" type="button">+ เพิ่มตัวเลือก</button>
+        </div>
+
+      </div>
+
+      <!-- Action buttons -->
+      <div class="form-actions">
+        <button class="btn-cancel">ยกเลิก</button>
+        <button class="btn-save">บันทึก</button>
+      </div>
+
+    </div>
+
+    <!-- ===== State 3 — รายการเมนูที่บันทึกแล้ว ===== -->
+    <div id="menu-list">
+      <div class="menu-list-header">
+        <span class="menu-list-title">เมนูทั้งหมด</span>
+        <button class="btn-add-menu" id="btn-add-menu-list">+ เพิ่มเมนู</button>
+      </div>
+      <div id="menu-list-items"></div>
+    </div>
+
+  </div>
 
   <script src="admin.js"></script>
+  <script>requireLogin();</script>
+
 </body>
 </html>
