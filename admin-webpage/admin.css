@@ -208,12 +208,6 @@ body {
   gap: 25px;
   color: var(--color-bg);
 }
-.header-brand-group h1 {
-  font-size: 20px;
-  background-color: #6d1c1c;
-  border-radius: 10px;
-  padding: 5px 15px;
-}
 
 .header-logo {
   height: 48px;
@@ -301,4 +295,49 @@ body {
 /* ===================================================
    Edit Menu page
    =================================================== */
-   
+/* ===================================================
+   Header
+   =================================================== */
+.menu-header {
+  gap: 15px;
+  width: 100%;
+  height: 80px;
+  background-color: var(--color-primary);
+  padding: 0px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+ 
+.btn-back {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: var(--radius-sm, 8px);
+  color: #fff;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 5px 10px;
+  flex-shrink: 0;
+
+  /* ทำให้เป็นกรอบสี่เหลี่ยม + จัดลูกศรกลางกรอบ */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-back:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+ 
+.header-title {
+  flex: 1;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+ 
+ 

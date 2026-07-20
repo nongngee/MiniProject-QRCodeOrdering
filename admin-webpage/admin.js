@@ -59,3 +59,9 @@ function logout() {
   sessionStorage.removeItem("isAdminLoggedIn");
   window.location.href = "index.html";
 }
+
+
+// ===== ส่วนที่ 6 — ย้อนกลับไปหน้า home =====
+function handleBack() {
+  window.location.href = "admin-home.html";
+}
