@@ -231,24 +231,44 @@ body {
   background: rgba(255, 255, 255, 0.15);
 }
 
-/* ===== Grid ===== */
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr); /* บนมือถือแสดง 2 คอลัมน์ตามรูปแรก */
-  gap: 20px;
-  padding: 32px 24px 40px;
-  width: 100%;       /* สไตล์เริ่มต้น: บนมือถือให้ขยายเต็มความกว้าง */
-  max-width: 450px;  /* บล็อกไม่ให้ใหญ่เกินไปเวลามือถือจอกว้าง */
-  margin: 0 auto;    /* จัดให้อยู่ตรงกลางหน้าจอ */
+/* ===== Dashboard Centered Layout ===== */
+.dashboard-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 32px 20px;
 }
 
-/* ตั้งค่าสเกลเพิ่มเติมเมื่อเปิดบน แท็บเล็ต หรือ โน้ตบุ๊ก/คอมพิวเตอร์ */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+/* หากมี 3 การ์ด ให้การ์ดที่ 3 อยู่กึ่งกลางแถวที่สองบนหน้าจอมือถือ */
+.dashboard-card:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+  width: calc(50% - 10px);
+  justify-self: center;
+}
+
+/* บนแท็บเล็ตและจอคอมพิวเตอร์: จัดเรียง 3 การ์ดแนวนอนแถวเดียวอย่างสมดุลตรงกลาง */
 @media (min-width: 768px) {
   .dashboard-grid {
-    grid-template-columns: repeat(3, 1fr); /* บนไอแพด/คอม เปลี่ยนเป็น 3 คอลัมน์ให้ดูเต็มขึ้น */
-    max-width: 800px;  /* ขยายขนาดความกว้างของกลุ่มสี่เหลี่ยมให้สมส่วนกับจอใหญ่ */
-    gap: 30px;         /* เพิ่มระยะห่างระหว่างปุ่มให้ดูโปร่งสบายตา */
-    padding: 60px 24px;
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 760px;
+    gap: 28px;
+  }
+
+  .dashboard-card:last-child:nth-child(odd) {
+    grid-column: auto;
+    width: 100%;
+    justify-self: stretch;
   }
 }
 

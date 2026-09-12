@@ -3,159 +3,218 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>แก้ไขเมนู — ลาวอ้อยต้อย</title>
+  <title>จัดการเมนูอาหาร — ลาวอ้อยต้อย</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="admin.css">
-  <link rel="stylesheet" href="admin-pages.css">
-  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css?v=3">
+  <link rel="stylesheet" href="admin-pages.css?v=3">
+  <link rel="icon" type="image/png" href="image/lot_logo.png">
 </head>
 <body>
 
   <!-- ===== Header ===== -->
   <header class="menu-header">
-    <button class="btn-back" onclick="handleBack()"><</button>
-    <span class="header-title">EDIT MENU</span>
+    <div class="header-left">
+      <button class="btn-back" onclick="handleBack()" title="กลับหน้าหลัก" aria-label="กลับ">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <div class="header-title-group">
+        <span class="header-title">จัดการเมนูอาหาร</span>
+        <span class="header-subtitle">EDIT MENU</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <a href="../customer-webpage/index.html" target="_blank" class="btn-header-view-cust" title="เปิดหน้าสั่งอาหารของลูกค้า (เปิดแท็บใหม่)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+          <polyline points="15 3 21 3 21 9"></polyline>
+          <line x1="10" y1="14" x2="21" y2="3"></line>
+        </svg>
+        <span>ดูหน้าลูกค้า</span>
+      </a>
+      <button type="button" class="btn-header-reset" onclick="resetAllMenus()" title="ล้างรายการเมนูทั้งหมด">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"></polyline>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        </svg>
+        <span>ล้างเมนู</span>
+      </button>
+      <button class="btn-header-add" onclick="openMenuModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <span>เพิ่มเมนู</span>
+      </button>
+    </div>
   </header>
 
-  <!-- ===== Page wrapper ===== -->
-  <div class="edit-menu-wrap">
+  <!-- ===== Main Page Content ===== -->
+  <main class="edit-menu-container">
 
-    <!-- ===== State 1 — Empty state ===== -->
-    <div class="empty-state">
+    <!-- Protocol Notification Banner -->
+    <div id="protocol-hint-banner" style="display: none;" class="protocol-banner">
+      💡 <strong>คำแนะนำการเชื่อมต่อ:</strong> คุณกำลังเปิดไฟล์ผ่าน <code>file://</code> หากคุณเปิดหน้าลูกค้าผ่าน Live Server (เช่น http://127.0.0.1:5500) ข้อมูลจะไม่ลิงก์ข้ามกันเนื่องจากระบบความปลอดภัยของเบราว์เซอร์ 
+      — <strong>วิธีแก้:</strong> ให้กดปุ่ม <strong>"ดูหน้าลูกค้า"</strong> ด้านบนขวา หรือเปิดแอดมินผ่าน <a href="http://127.0.0.1:5500/admin-webpage/admin-editmenu.html">http://127.0.0.1:5500/admin-webpage/admin-editmenu.html</a>
+    </div>
+
+    <!-- Category Filter Bar -->
+    <section class="category-filter-section" aria-label="หมวดหมู่อาหาร">
+      <div class="category-filter-scroll" id="category-filter-bar">
+        <!-- Tabs injected dynamically via JS -->
+      </div>
+    </section>
+
+    <!-- Sub-bar: Search & Info -->
+    <div class="menu-subbar">
+      <div class="search-box">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="search-icon">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="menu-search-input" placeholder="ค้นหาชื่อเมนู..." oninput="handleSearch(this.value)">
+      </div>
+      <div class="menu-stats">
+        แสดง <span id="displayed-count">0</span> รายการ
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" id="menu-empty-state" style="display: none;">
       <div class="empty-state-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="12" y1="5" x2="12" y2="19"/>
-          <line x1="5" y1="12" x2="19" y2="12"/>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+          <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+          <line x1="6" y1="1" x2="6" y2="4"></line>
+          <line x1="10" y1="1" x2="10" y2="4"></line>
+          <line x1="14" y1="1" x2="14" y2="4"></line>
         </svg>
       </div>
-      <span class="empty-state-label">เพิ่มเมนูแรก</span>
-      <span class="empty-state-sub">แตะเพื่อเริ่มเพิ่มเมนูอาหาร</span>
+      <span class="empty-state-label" id="empty-state-text">ยังไม่มีรายการเมนูอาหาร</span>
+      <span class="empty-state-sub">กดปุ่มด้านล่างเพื่อเริ่มเพิ่มเมนูอาหาร</span>
+      <div class="empty-state-actions">
+        <button class="btn-add-initial" onclick="openMenuModal()">+ เพิ่มเมนู</button>
+      </div>
     </div>
 
-    <!-- ===== State 2 — Form เพิ่มเมนู ===== -->
-    <div class="add-form-wrap">
+    <!-- Menu Cards Grid -->
+    <section class="menu-grid" id="menu-grid-items" aria-label="รายการเมนู"></section>
 
-      <div class="form-card">
+  </main>
 
-        <!-- Desktop: image + fields side by side -->
-        <div class="form-grid">
+  <!-- ===== Modal Popup สำหรับ เพิ่ม / แก้ไข เมนู ===== -->
+  <div class="modal-overlay" id="menu-modal" style="display: none;" onclick="handleOverlayClick(event)">
+    <div class="modal-container" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <div class="modal-header-text">
+          <h2 class="modal-title" id="modal-title">เพิ่มเมนูใหม่</h2>
+          <span class="modal-subtitle">กรอกข้อมูลเมนูอาหารและกำหนดตัวเลือกเพิ่มเติม</span>
+        </div>
+        <button class="modal-close-btn" onclick="closeMenuModal()" type="button" aria-label="ปิด">✕</button>
+      </div>
 
-          <!-- Image upload -->
-          <div class="form-image-col">
-            <div class="image-upload" id="image-preview" onclick="document.getElementById('file-input').click()">
-              <div class="image-upload-placeholder" id="image-placeholder">
-                <div class="image-upload-icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                    <circle cx="8.5" cy="8.5" r="1.5"/>
-                    <polyline points="21 15 16 10 5 21"/>
-                  </svg>
+      <!-- Modal Body -->
+      <form class="modal-body" id="menu-form" onsubmit="event.preventDefault(); saveMenu();">
+        <input type="hidden" id="modal-menu-id" value="">
+
+        <!-- Top Section: Image + Basic Info -->
+        <div class="modal-form-top">
+          <!-- Image Upload Column -->
+          <div class="form-image-column">
+            <label class="form-label">รูปภาพเมนูอาหาร</label>
+            <div class="image-upload-box" id="image-upload-box" onclick="document.getElementById('file-input').click()">
+              <div class="image-placeholder" id="image-placeholder">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                  <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+                <span class="upload-label">แตะเพื่อใส่รูปอาหาร</span>
+                <span class="upload-hint">อัตราส่วน 16:9</span>
+              </div>
+              <img id="image-preview-img" class="image-preview-img" style="display:none;" alt="รูปเมนู">
+              <button type="button" class="btn-remove-image" id="image-remove-btn" style="display:none;" onclick="removeImage(event)" title="ลบรูปภาพ">✕</button>
+            </div>
+            <input type="file" id="file-input" accept="image/*" style="display:none;" onchange="handleImageUpload(event)">
+          </div>
+
+          <!-- Basic Info Fields -->
+          <div class="form-fields-column">
+            <!-- Menu Name -->
+            <div class="form-group">
+              <label class="form-label" for="menu-name">ชื่อเมนู <span class="required-star">*</span></label>
+              <input class="form-input" type="text" id="menu-name" placeholder="ระบุชื่อเมนูอาหาร" required>
+            </div>
+
+            <div class="form-row-two">
+              <!-- Category -->
+              <div class="form-group">
+                <label class="form-label" for="menu-category">หมวดหมู่ <span class="required-star">*</span></label>
+                <select class="form-select" id="menu-category" required>
+                  <!-- Injected via JS -->
+                </select>
+              </div>
+
+              <!-- Price -->
+              <div class="form-group">
+                <label class="form-label" for="menu-price">ราคา (บาท) <span class="required-star">*</span></label>
+                <div class="price-input-wrapper">
+                  <span class="currency-prefix">฿</span>
+                  <input class="form-input price-input" type="number" id="menu-price" placeholder="0" min="0" step="any" required>
                 </div>
-                <span class="image-upload-label">เพิ่มรูปภาพ</span>
-              </div>
-              <img id="image-preview-img" class="image-preview-img" style="display:none" alt="preview">
-              <button type="button" class="image-remove" id="image-remove-btn" style="display:none" onclick="removeImage(event)">✕</button>
-            </div>
-            <input type="file" id="file-input" accept="image/*" style="display:none" onchange="handleImageUpload(event)">
-            <span class="image-upload-hint">แตะเพื่อเลือกรูป (16:9)</span>
-          </div>
-
-          <!-- Fields column -->
-          <div class="form-fields-col">
-
-            <!-- Menu name -->
-            <div class="form-group">
-              <label class="form-label" for="menu-name">ชื่อเมนู</label>
-              <input
-                class="form-input"
-                type="text"
-                id="menu-name"
-                placeholder="เช่น ข้าวผัดกระเพราไก่"
-              />
-            </div>
-
-            <!-- Price -->
-            <div class="form-group">
-              <label class="form-label" for="menu-price">ราคา</label>
-              <div class="price-wrap">
-                <span class="price-prefix">฿</span>
-                <input
-                  class="form-input"
-                  type="number"
-                  id="menu-price"
-                  placeholder="0"
-                  min="0"
-                />
               </div>
             </div>
 
+            <!-- Status Toggle -->
+            <div class="form-group">
+              <label class="form-label">สถานะการขาย</label>
+              <div class="status-toggle-wrapper">
+                <label class="switch">
+                  <input type="checkbox" id="menu-status" checked onchange="updateModalStatusText(this.checked)">
+                  <span class="slider round"></span>
+                </label>
+                <span class="status-label-text" id="menu-status-text">พร้อมขาย</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Options section -->
-        <div class="options-section">
-          <div class="form-group">
-            <label class="form-label" for="options-heading">หัวข้อตัวเลือก</label>
-            <input
-              class="form-input"
-              type="text"
-              id="options-heading"
-              placeholder="เช่น ตัวเลือกเพิ่มเติม, เพิ่มเติม"
-              value="ตัวเลือกเพิ่มเติม"
-            />
+        <!-- Option Groups Section -->
+        <div class="option-groups-section">
+          <div class="option-section-header">
+            <div>
+              <h3 class="section-title">กลุ่มตัวเลือกเพิ่มเติม (Options / Add-ons)</h3>
+              <p class="section-desc">กำหนดตัวเลือก เช่น ระดับความเผ็ด (เลือกได้ 1 อย่าง) หรือ ท็อปปิ้งเสริม (เลือกได้หลายอย่าง)</p>
+            </div>
+            <button type="button" class="btn-add-group" onclick="addOptionGroupUI()">+ เพิ่มกลุ่มตัวเลือก</button>
           </div>
 
-          <div id="options-container">
-
-            <div class="option-row">
-              <input class="option-name" type="text" placeholder="เช่น เพิ่มไข่" value="เพิ่มไข่"/>
-              <div class="option-price-wrap">
-                <span class="currency">฿</span>
-                <input class="option-price" type="number" placeholder="0" value="10" min="0"/>
-              </div>
-              <button class="option-remove" onclick="removeOptionRow(this)" type="button">✕</button>
-            </div>
-
-            <div class="option-row">
-              <input class="option-name" type="text" placeholder="เช่น เพิ่มชีส" value="เพิ่มชีส"/>
-              <div class="option-price-wrap">
-                <span class="currency">฿</span>
-                <input class="option-price" type="number" placeholder="0" value="20" min="0"/>
-              </div>
-              <button class="option-remove" onclick="removeOptionRow(this)" type="button">✕</button>
-            </div>
-
+          <!-- Container for Option Groups -->
+          <div id="option-groups-container" class="option-groups-list">
+            <!-- Dynamically populated -->
           </div>
-
-          <button class="btn-add-option" type="button">+ เพิ่มตัวเลือก</button>
         </div>
 
-      </div>
+      </form>
 
-      <!-- Action buttons -->
-      <div class="form-actions">
-        <button class="btn-cancel">ยกเลิก</button>
-        <button class="btn-save">บันทึก</button>
+      <!-- Modal Footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn-modal-cancel" onclick="closeMenuModal()">ยกเลิก</button>
+        <button type="button" class="btn-modal-save" onclick="saveMenu()">บันทึกข้อมูล</button>
       </div>
 
     </div>
-
-    <!-- ===== State 3 — รายการเมนูที่บันทึกแล้ว ===== -->
-    <div id="menu-list">
-      <div class="menu-list-header">
-        <span class="menu-list-title">เมนูทั้งหมด</span>
-        <button class="btn-add-menu" id="btn-add-menu-list">+ เพิ่มเมนู</button>
-      </div>
-      <div id="menu-list-items"></div>
-    </div>
-
   </div>
 
-  <script src="admin.js"></script>
-  <script>requireLogin();</script>
-
+  <!-- Scripts -->
+  <script src="admin.js?v=3"></script>
+  <script>
+    // ตรวจสอบสถานะการเข้าสู่ระบบ
+    requireLogin();
+  </script>
 </body>
 </html>
