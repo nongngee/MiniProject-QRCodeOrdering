@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เช็คบิลลูกค้า — ลาวอ้อยต้อย</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&family=Prompt:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css?v=5">
+  <link rel="stylesheet" href="admin-pages.css?v=5">
+  <link rel="icon" type="image/png" href="image/lot_logo.png">
+</head>
+<body>
+
+  <!-- ===== Header ===== -->
+  <header class="menu-header">
+    <div class="header-left">
+      <button class="btn-back" onclick="handleBack()" title="กลับหน้าหลักแอดมิน" aria-label="กลับ">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <div class="header-title-group">
+        <span class="header-title">เช็คบิลลูกค้า</span>
+        <span class="header-subtitle">BILL CHECKOUT &amp; PAYMENT</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <a href="../customer-webpage/index.html" target="_blank" class="btn-header-view-cust" title="เปิดดูหน้าสั่งอาหารของลูกค้า">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+          <polyline points="15 3 21 3 21 9"></polyline>
+          <line x1="10" y1="14" x2="21" y2="3"></line>
+        </svg>
+        <span>ดูหน้าลูกค้า</span>
+      </a>
+      <button type="button" class="btn-header-reset-bills" onclick="clearAllBillsConfirm()" title="ล้างรายการบิลทั้งหมดออกจากระบบ">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"></polyline>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        </svg>
+        <span>ล้างบิลทั้งหมด</span>
+      </button>
+      <button type="button" class="btn-header-add" onclick="manualSyncCheckbill()" title="รีเฟรชข้อมูลบิลล่าสุด">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 4 23 10 17 10"></polyline>
+          <polyline points="1 20 1 14 7 14"></polyline>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+        </svg>
+        <span>ซิงค์ข้อมูล</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ===== Main Content ===== -->
+  <main class="checkbill-container">
+
+    <!-- Protocol Notification Banner -->
+    <div id="protocol-hint-banner" style="display: none;" class="protocol-banner">
+      💡 <strong>คำแนะนำการเชื่อมต่อ:</strong> คุณกำลังเปิดไฟล์ผ่าน <code>file://</code> หากคุณเปิดหน้าลูกค้าผ่าน Live Server ข้อมูลจะไม่ลิงก์ข้ามกันเนื่องจากระบบความปลอดภัยของเบราว์เซอร์ 
+      — <strong>วิธีแก้:</strong> ให้กดปุ่ม <strong>"ดูหน้าลูกค้า"</strong> ด้านบนขวา หรือเปิดแอดมินผ่าน <a href="http://127.0.0.1:5500/admin-webpage/admin-checkbill.html">http://127.0.0.1:5500/admin-webpage/admin-checkbill.html</a>
+    </div>
+
+    <!-- 2-Column POS Layout -->
+    <div class="checkbill-layout-grid">
+
+      <!-- ===== LEFT COLUMN: Cashier Control & Summary Panel ===== -->
+      <aside class="checkbill-sidebar">
+        
+        <!-- Summary Stats Card -->
+        <div class="checkbill-stats-panel">
+          <div class="stat-hero-revenue">
+            <span class="stat-hero-label">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="1" x2="12" y2="23"></line>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+              </svg>
+              ยอดขายที่ชำระแล้ววันนี้
+            </span>
+            <span class="stat-hero-val" id="stat-total-revenue">฿0</span>
+          </div>
+
+          <div class="stat-mini-grid">
+            <div class="stat-mini-card pending">
+              <span class="stat-mini-num pending" id="stat-pending-bills">0</span>
+              <span class="stat-mini-label">⏳ บิลรอชำระ</span>
+            </div>
+            <div class="stat-mini-card paid">
+              <span class="stat-mini-num paid" id="stat-paid-bills">0</span>
+              <span class="stat-mini-label">✔️ เช็คบิลแล้ว</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controls Container: Tabs + Search -->
+        <div class="checkbill-sidebar-controls">
+          <!-- Filter Tabs Navigation Card -->
+          <div class="checkbill-nav-card">
+            <div class="sidebar-card-title">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+              </svg>
+              <span>สถานะบิลอาหาร</span>
+            </div>
+
+            <button type="button" class="checkbill-tab-btn active" id="tab-pending" onclick="setCheckbillFilter('pending')">
+              <span class="tab-btn-text">⏳ รอชำระเงิน</span>
+              <span class="tab-badge pending" id="badge-pending-count">0</span>
+            </button>
+            <button type="button" class="checkbill-tab-btn" id="tab-paid" onclick="setCheckbillFilter('paid')">
+              <span class="tab-btn-text">✔️ เช็คบิลแล้ว</span>
+              <span class="tab-badge paid" id="badge-paid-count">0</span>
+            </button>
+            <button type="button" class="checkbill-tab-btn" id="tab-all" onclick="setCheckbillFilter('all')">
+              <span class="tab-btn-text">📋 ทั้งหมด</span>
+              <span class="tab-badge all" id="badge-all-count">0</span>
+            </button>
+          </div>
+
+          <!-- Search Box Card -->
+          <div class="checkbill-search-card">
+            <div class="sidebar-card-title">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <span>ค้นหาด่วน</span>
+            </div>
+            <div class="sidebar-search-wrap">
+              <input type="text" id="checkbill-search-input" placeholder="ค้นหาเลขโต๊ะ หรือชื่อลูกค้า..." oninput="handleCheckbillSearch(this.value)">
+            </div>
+          </div>
+        </div>
+
+        <!-- Tip Box -->
+        <div class="checkbill-tip-card">
+          💡 <strong>คำแนะนำ:</strong> เมื่อลูกค้ามาที่เคาน์เตอร์ คลิกที่ใบบิลเพื่อตรวจสอบและรับชำระเงิน (PromptPay หรือเงินสด) พร้อมเคลียร์โต๊ะให้ว่างอัตโนมัติ
+        </div>
+
+      </aside>
+
+      <!-- ===== RIGHT COLUMN: Slips Desk (Main Workspace) ===== -->
+      <section class="checkbill-main-content">
+        <div class="receipts-desk-header">
+          <div class="receipts-desk-title" id="receipts-current-title">
+            🧾 รายการบิลรอชำระเงิน
+          </div>
+          <span class="receipts-desk-hint">* คลิกที่ใบบิลเพื่อเปิดหน้าต่างตรวจสอบออเดอร์และเช็คบิล</span>
+        </div>
+
+        <!-- Slips Grid Container -->
+        <div class="receipt-slips-grid" id="receipt-slips-grid">
+          <!-- Slips injected via admin.js -->
+        </div>
+
+        <!-- Empty State -->
+        <div class="checkbill-empty-state" id="checkbill-empty-state" style="display: none;">
+          <div class="empty-icon">🧾</div>
+          <h3 id="checkbill-empty-title">ไม่มีรายการบิลในหมวดนี้</h3>
+          <p id="checkbill-empty-desc">เมื่อลูกค้าสั่งอาหารจากโต๊ะ ระบบจะสร้างใบสลิปปรากฏที่หน้านี้แบบเรียลไทม์ทันที</p>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- ===== Modal ตรวจสอบและชำระเงิน (Bill Checkout Modal) ===== -->
+  <div id="checkbill-modal" class="modal-overlay" style="display: none;" onclick="handleCheckbillModalOverlay(event)">
+    <div class="checkbill-modal-box" role="dialog" aria-modal="true">
+      
+      <!-- Modal Slip Top Decoration -->
+      <div class="modal-slip-teeth top"></div>
+      
+      <!-- Modal Header -->
+      <div class="checkbill-modal-header">
+        <div class="modal-header-left">
+          <span class="modal-bill-badge" id="modal-bill-number">บิล 1</span>
+          <div class="modal-bill-info">
+            <h2 class="modal-table-title" id="modal-bill-table-guest">📍 โต๊ะ 1 • คุณลูกค้า</h2>
+            <div class="modal-order-subline">
+              <span id="modal-bill-order-id">รหัส: ORD-XXXXXX</span>
+              <span class="bullet-sep">•</span>
+              <span id="modal-bill-time">12:00 น.</span>
+              <span class="modal-status-badge" id="modal-bill-status-badge">รอชำระเงิน</span>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn-modal-close-icon" onclick="closeCheckbillModal()" aria-label="ปิดหน้าต่าง">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Modal Body (Order Breakdown) -->
+      <div class="checkbill-modal-body">
+        <div class="modal-section-title">
+          <span>รายการอาหารที่สั่ง</span>
+          <span id="modal-items-total-qty" class="badge-qty">(0 รายการ)</span>
+        </div>
+
+        <div class="modal-order-items-table" id="modal-items-container">
+          <!-- Items injected via JS -->
+        </div>
+
+        <!-- Total Calculation Box -->
+        <div class="modal-total-box">
+          <div class="total-row subtotal">
+            <span>รวมค่าอาหาร</span>
+            <span id="modal-subtotal-val">฿0</span>
+          </div>
+          <div class="total-row grand-total">
+            <span>ยอดรวมสุทธิที่ต้องชำระ</span>
+            <span class="grand-total-amount" id="modal-grand-total-val">฿0</span>
+          </div>
+        </div>
+
+        <!-- Payment & Checkout Panel (Shown if Pending) -->
+        <div id="modal-payment-panel" class="modal-payment-panel">
+          <div class="payment-tabs">
+            <button type="button" class="payment-tab active" id="tab-pay-promptpay" onclick="setPaymentMethod('promptpay')">
+              📱 สแกน QR PromptPay
+            </button>
+            <button type="button" class="payment-tab" id="tab-pay-cash" onclick="setPaymentMethod('cash')">
+              💵 ชำระด้วยเงินสด
+            </button>
+          </div>
+
+          <!-- PromptPay View -->
+          <div id="payment-view-promptpay" class="payment-view active">
+            <div class="promptpay-card">
+              <div class="promptpay-header">
+                <span class="promptpay-icon-tag">PromptPay</span>
+                <span class="promptpay-title">สแกนจ่ายพร้อมเพย์</span>
+              </div>
+              <div class="promptpay-qr-wrapper">
+                <div class="qr-code-box">
+                  <img id="promptpay-qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=LAO_OI_TOI_PROMPTPAY" alt="QR Code พร้อมเพย์">
+                </div>
+              </div>
+              <div class="promptpay-info-text">
+                <div class="pp-payee">ร้านอาหารอีสาน ลาวอ้อยต้อย</div>
+                <div class="pp-amount" id="pp-display-amount">฿0</div>
+                <div class="pp-note">⚡ ลูกค้าเปิดแอปทุกธนาคารแล้วสแกนชำระเงินได้ทันที</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cash View -->
+          <div id="payment-view-cash" class="payment-view" style="display: none;">
+            <div class="cash-calc-card">
+              <div class="cash-input-row">
+                <label for="cash-received-input">รับเงินสดมา (บาท):</label>
+                <div class="cash-input-wrap">
+                  <input type="number" id="cash-received-input" placeholder="กรอกเงินที่รับมา" oninput="calculateCashChange()">
+                  <span class="unit">฿</span>
+                </div>
+              </div>
+              <div class="quick-cash-chips">
+                <button type="button" class="chip-cash" onclick="setQuickCash(100)">฿100</button>
+                <button type="button" class="chip-cash" onclick="setQuickCash(500)">฿500</button>
+                <button type="button" class="chip-cash" onclick="setQuickCash(1000)">฿1,000</button>
+                <button type="button" class="chip-cash" onclick="setQuickCashExact()">จ่ายพอดี</button>
+              </div>
+              <div class="cash-change-display">
+                <span class="change-label">เงินทอน:</span>
+                <span class="change-val" id="cash-change-val">฿0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Clear Table Option -->
+          <div class="clear-table-option-row">
+            <label class="cb-container">
+              <input type="checkbox" id="cb-clear-table-after-pay" checked>
+              <span class="checkmark"></span>
+              <span class="cb-label">
+                <strong>เคลียร์สถานะโต๊ะให้เป็น "โต๊ะว่าง (สีเขียว)" ทันที</strong>
+                <small>เพื่อให้ลูกค้ารายใหม่สามารถเลือกโต๊ะและสั่งอาหารได้</small>
+              </span>
+            </label>
+          </div>
+
+        </div>
+
+        <!-- Paid Status Banner (Shown if already Paid) -->
+        <div id="modal-paid-banner" class="modal-paid-banner" style="display: none;">
+          <div class="paid-banner-icon">✔️</div>
+          <div class="paid-banner-text">
+            <strong>บิลนี้ได้รับการชำระเงินเรียบร้อยแล้ว</strong>
+            <span id="modal-paid-timestamp">เมื่อ 14:30 น.</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer Action Buttons -->
+      <div class="checkbill-modal-footer">
+        <div class="footer-left">
+          <button type="button" class="btn-modal-print" onclick="printCurrentOrderReceipt()" title="พิมพ์ใบเสร็จสำหรับลูกค้า">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 6 2 18 2 18 9"></polyline>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+              <rect x="6" y="14" width="12" height="8"></rect>
+            </svg>
+            <span>พิมพ์ใบเสร็จ</span>
+          </button>
+        </div>
+        <div class="footer-right">
+          <button type="button" class="btn-modal-cancel" onclick="closeCheckbillModal()">ปิดหน้าต่าง</button>
+          
+          <!-- BIG GREEN BUTTON FOR CONFIRMING PAYMENT -->
+          <button type="button" class="btn-confirm-payment" id="btn-confirm-payment" onclick="confirmPaymentCurrentOrder()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span id="btn-confirm-payment-text">ชำระเงินเรียบร้อย</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Slip Bottom Decoration -->
+      <div class="modal-slip-teeth bottom"></div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="admin.js?v=5"></script>
+  <script>
+    requireLogin();
+  </script>
+</body>
+</html>

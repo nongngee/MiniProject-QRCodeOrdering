@@ -66,14 +66,26 @@ body {
 
 /* ===== Logo ===== */
 .logo-wrap {
-  margin-bottom: 12px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .logo-wrap img,
-.logo-wrap svg {
-  width: 96px;
-  height: 96px;
+.logo-wrap svg,
+.login-logo {
+  width: 104px;
+  height: 104px;
   object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 4px 12px rgba(122, 26, 26, 0.22));
+  transition: transform 0.2s ease;
+}
+
+.logo-wrap img:hover,
+.login-logo:hover {
+  transform: scale(1.05);
 }
 
 /* ===== Brand name ===== */

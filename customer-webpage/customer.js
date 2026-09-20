@@ -7,6 +7,7 @@ const DB_VERSION = 1;
 const STORE_NAME = "app_store";
 const MENU_STORAGE_KEY = "lao_oi_toi_menu";
 const ORDERS_STORAGE_KEY = "lao_oi_toi_orders";
+const TABLES_STORAGE_KEY = "lao_oi_toi_tables";
 
 // ===== 1. Persistent Storage Service (IndexedDB + LocalStorage) =====
 function openDB() {
@@ -94,13 +95,241 @@ let cart = [];
 let currentCategory = "all";
 let searchQuery = "";
 
+// Table & Customer State
+let currentTableId = null;
+let currentCustomerName = "";
+let selectedModalTableId = null;
+let tablesList = [];
+
 // Customization Modal State
 let activeCustomizingItem = null;
 let customizeQty = 1;
 
 
 /* ===================================================
-   3. Initial Loader & Real-time Menu Sync
+   3. Table Management & Floor Plan Service
+   =================================================== */
+function getDefaultTables() {
+  const list = [];
+  for (let i = 1; i <= 15; i++) {
+    list.push({
+      id: i,
+      name: `โต๊ะ ${i}`,
+      status: "available", // "available" | "occupied"
+      customerName: null,
+      occupiedAt: null,
+      currentOrderId: null
+    });
+  }
+  return list;
+}
+
+async function loadTablesData() {
+  let tables = await getStoredData(TABLES_STORAGE_KEY, null);
+  if (!tables || !Array.isArray(tables) || tables.length === 0) {
+    tables = getDefaultTables();
+    await setStoredData(TABLES_STORAGE_KEY, tables);
+  } else if (tables.length < 15) {
+    for (let i = tables.length + 1; i <= 15; i++) {
+      tables.push({
+        id: i,
+        name: `โต๊ะ ${i}`,
+        status: "available",
+        customerName: null,
+        occupiedAt: null,
+        currentOrderId: null
+      });
+    }
+    await setStoredData(TABLES_STORAGE_KEY, tables);
+  }
+  return tables;
+}
+
+async function saveTablesData(tables) {
+  await setStoredData(TABLES_STORAGE_KEY, tables);
+  try {
+    const bc = new BroadcastChannel("lao_oi_toi_sync");
+    bc.postMessage({ type: "TABLES_UPDATED", timestamp: Date.now() });
+  } catch (e) {}
+}
+
+function renderCustomerFloorPlan() {
+  const container = document.getElementById("customer-floor-plan");
+  if (!container) return;
+
+  let html = "";
+  for (let i = 1; i <= 15; i++) {
+    const t = tablesList.find((item) => item.id === i) || { id: i, status: "available" };
+    const isOccupied = t.status === "occupied";
+    const isMyTable = currentTableId && parseInt(currentTableId) === i;
+    const isSelected = selectedModalTableId === i;
+
+    let statusClass = "available";
+    let statusText = "ว่าง";
+
+    if (isSelected) {
+      statusClass = "selected";
+      statusText = "เลือกแล้ว";
+    } else if (isMyTable) {
+      statusClass = "selected";
+      statusText = "โต๊ะของคุณ";
+    } else if (isOccupied) {
+      statusClass = "occupied";
+      statusText = "ไม่ว่าง";
+    }
+
+    html += `
+      <div class="table-node ${statusClass}" data-table-id="${i}" onclick="selectTableNode(${i})">
+        <span class="table-num">${i}</span>
+        <span class="table-status-tag">${statusText}</span>
+      </div>
+    `;
+  }
+
+  container.innerHTML = html;
+}
+
+function selectTableNode(tableId) {
+  const t = tablesList.find((item) => item.id === tableId);
+  const isOccupied = t && t.status === "occupied";
+  const isMyTable = currentTableId && parseInt(currentTableId) === tableId;
+
+  if (isOccupied && !isMyTable) {
+    alert(`โต๊ะ ${tableId} กำลังใช้งานอยู่ (ไม่ว่าง) กรุณาเลือกโต๊ะที่ว่าง (สีเขียว) ครับ`);
+    return;
+  }
+
+  selectedModalTableId = tableId;
+  renderCustomerFloorPlan();
+
+  const indicator = document.getElementById("indicator-table-text");
+  if (indicator) {
+    indicator.textContent = `โต๊ะ ${tableId}`;
+    indicator.style.color = "#C25A1A";
+  }
+
+  handleCustomerNameInput();
+}
+
+function handleCustomerNameInput() {
+  const input = document.getElementById("customer-name-input");
+  const btn = document.getElementById("btn-confirm-table");
+  if (!input || !btn) return;
+
+  const name = input.value.trim();
+  if (selectedModalTableId && name.length > 0) {
+    btn.disabled = false;
+  } else {
+    btn.disabled = true;
+  }
+}
+
+async function confirmTableSelection() {
+  const input = document.getElementById("customer-name-input");
+  if (!selectedModalTableId) {
+    alert("กรุณาจิ้มเลือกโต๊ะในแผนผังก่อนครับ");
+    return;
+  }
+  const name = input ? input.value.trim() : "";
+  if (!name) {
+    alert("กรุณากรอกชื่อของคุณ");
+    if (input) input.focus();
+    return;
+  }
+
+  tablesList = await loadTablesData();
+
+  // If changing table, free the old table
+  if (currentTableId && parseInt(currentTableId) !== selectedModalTableId) {
+    const oldIdx = tablesList.findIndex((t) => t.id === parseInt(currentTableId));
+    if (oldIdx !== -1) {
+      tablesList[oldIdx].status = "available";
+      tablesList[oldIdx].customerName = null;
+      tablesList[oldIdx].occupiedAt = null;
+    }
+  }
+
+  // Claim the new table
+  const newIdx = tablesList.findIndex((t) => t.id === selectedModalTableId);
+  if (newIdx !== -1) {
+    if (tablesList[newIdx].status === "occupied" && (!currentTableId || parseInt(currentTableId) !== selectedModalTableId)) {
+      alert(`ขออภัยครับ โต๊ะ ${selectedModalTableId} เพิ่งมีลูกค้าท่านอื่นเลือกไป กรุณาเลือกโต๊ะอื่น`);
+      renderCustomerFloorPlan();
+      return;
+    }
+
+    tablesList[newIdx].status = "occupied";
+    tablesList[newIdx].customerName = name;
+    tablesList[newIdx].occupiedAt = Date.now();
+  }
+
+  await saveTablesData(tablesList);
+
+  currentTableId = selectedModalTableId;
+  currentCustomerName = name;
+  sessionStorage.setItem("lao_oi_toi_table_id", currentTableId);
+  sessionStorage.setItem("lao_oi_toi_customer_name", currentCustomerName);
+
+  const modal = document.getElementById("table-selection-modal");
+  if (modal) modal.style.display = "none";
+  document.body.style.overflow = "";
+
+  updateTableInfoBar();
+  renderCustomerFloorPlan();
+}
+
+function openTableModal() {
+  const modal = document.getElementById("table-selection-modal");
+  if (!modal) return;
+
+  selectedModalTableId = currentTableId ? parseInt(currentTableId) : null;
+  const input = document.getElementById("customer-name-input");
+  if (input) {
+    input.value = currentCustomerName || "";
+  }
+  const indicator = document.getElementById("indicator-table-text");
+  if (indicator) {
+    indicator.textContent = selectedModalTableId ? `โต๊ะ ${selectedModalTableId}` : "ยังไม่ได้เลือกโต๊ะ";
+    indicator.style.color = selectedModalTableId ? "#C25A1A" : "#888";
+  }
+
+  const closeBtn = document.getElementById("btn-close-table-modal");
+  if (closeBtn) {
+    closeBtn.style.display = (currentTableId && currentCustomerName) ? "flex" : "none";
+  }
+
+  renderCustomerFloorPlan();
+  handleCustomerNameInput();
+
+  modal.style.display = "flex";
+  document.body.style.overflow = "hidden";
+}
+
+function closeTableModal() {
+  if (!currentTableId || !currentCustomerName) {
+    alert("กรุณาเลือกโต๊ะและกรอกชื่อก่อนเริ่มสั่งอาหารครับ");
+    return;
+  }
+  const modal = document.getElementById("table-selection-modal");
+  if (modal) modal.style.display = "none";
+  document.body.style.overflow = "";
+}
+
+function updateTableInfoBar() {
+  const label = document.getElementById("table-current-label");
+  const nameEl = document.getElementById("customer-current-name");
+  if (label) {
+    label.textContent = currentTableId ? `โต๊ะ ${currentTableId}` : "ยังไม่ได้เลือกโต๊ะ";
+  }
+  if (nameEl) {
+    const formattedName = currentCustomerName.startsWith("คุณ") ? currentCustomerName : `คุณ ${currentCustomerName}`;
+    nameEl.textContent = currentCustomerName ? formattedName : "กรุณาเลือกโต๊ะก่อนสั่งอาหาร";
+  }
+}
+
+
+/* ===================================================
+   4. Initial Loader & Real-time Menu & Table Sync
    =================================================== */
 let syncChannel = null;
 try {
@@ -110,35 +339,72 @@ try {
       await loadMenuData();
       renderCategoryTabs();
       renderMenuGrid();
+    } else if (e.data && e.data.type === "TABLES_UPDATED") {
+      tablesList = await loadTablesData();
+      renderCustomerFloorPlan();
+      updateTableInfoBar();
     }
   };
 } catch (err) {}
 
 document.addEventListener("DOMContentLoaded", async function () {
+  // Load menu and tables
   await loadMenuData();
   renderCategoryTabs();
   renderMenuGrid();
   updateCartUI();
+
+  tablesList = await loadTablesData();
+
+  // Load session table & customer name
+  currentTableId = sessionStorage.getItem("lao_oi_toi_table_id");
+  currentCustomerName = sessionStorage.getItem("lao_oi_toi_customer_name") || "";
+
+  if (currentTableId) {
+    currentTableId = parseInt(currentTableId);
+    // Verify table is still valid
+    const myTable = tablesList.find((t) => t.id === currentTableId);
+    if (!myTable || myTable.status !== "occupied" || myTable.customerName !== currentCustomerName) {
+      // Table was cleared by admin or changed
+      currentTableId = null;
+      currentCustomerName = "";
+      sessionStorage.removeItem("lao_oi_toi_table_id");
+      sessionStorage.removeItem("lao_oi_toi_customer_name");
+      openTableModal();
+    } else {
+      updateTableInfoBar();
+    }
+  } else {
+    // First time visitor - must select table
+    openTableModal();
+  }
 
   if (window.location.protocol === "file:") {
     const banner = document.getElementById("protocol-hint-banner-cust");
     if (banner) banner.style.display = "block";
   }
 
-  // 1. ดักจับการเปลี่ยนแปลงเมื่อแอดมินอัปเดตเมนูในอีกหน้าจอ (localStorage storage event)
+  // 1. Storage event listener
   window.addEventListener("storage", async function (e) {
     if (e.key === MENU_STORAGE_KEY) {
       await loadMenuData();
       renderCategoryTabs();
       renderMenuGrid();
+    } else if (e.key === TABLES_STORAGE_KEY) {
+      tablesList = await loadTablesData();
+      renderCustomerFloorPlan();
+      updateTableInfoBar();
     }
   });
 
-  // 2. เมื่อสลับแท็บกลับมาที่หน้านี้ ให้รีเฟรชข้อมูลเมนูใหม่ล่าสุดเสมอ
+  // 2. Focus & Visibility Sync
   window.addEventListener("focus", async function () {
     await loadMenuData();
     renderCategoryTabs();
     renderMenuGrid();
+    tablesList = await loadTablesData();
+    renderCustomerFloorPlan();
+    updateTableInfoBar();
   });
 
   document.addEventListener("visibilitychange", async function () {
@@ -146,16 +412,25 @@ document.addEventListener("DOMContentLoaded", async function () {
       await loadMenuData();
       renderCategoryTabs();
       renderMenuGrid();
+      tablesList = await loadTablesData();
+      renderCustomerFloorPlan();
+      updateTableInfoBar();
     }
   });
 
-  // 3. Periodic Background Sync (ทุก 1.5 วินาที เช็คอัตโนมัติ)
+  // 3. Periodic Background Sync
   setInterval(async function () {
-    const latest = await getStoredData(MENU_STORAGE_KEY, []);
-    if (JSON.stringify(latest) !== JSON.stringify(menuItems)) {
-      menuItems = latest;
+    const latestMenu = await getStoredData(MENU_STORAGE_KEY, []);
+    if (JSON.stringify(latestMenu) !== JSON.stringify(menuItems)) {
+      menuItems = latestMenu;
       renderCategoryTabs();
       renderMenuGrid();
+    }
+    const latestTables = await getStoredData(TABLES_STORAGE_KEY, []);
+    if (latestTables && JSON.stringify(latestTables) !== JSON.stringify(tablesList)) {
+      tablesList = latestTables;
+      renderCustomerFloorPlan();
+      updateTableInfoBar();
     }
   }, 1500);
 });
@@ -168,8 +443,11 @@ async function manualSyncMenu() {
   const btn = document.getElementById("btn-customer-refresh");
   if (btn) btn.classList.add("spinning");
   await loadMenuData();
+  tablesList = await loadTablesData();
   renderCategoryTabs();
   renderMenuGrid();
+  renderCustomerFloorPlan();
+  updateTableInfoBar();
   setTimeout(() => {
     if (btn) btn.classList.remove("spinning");
   }, 500);
@@ -684,6 +962,12 @@ function clearCart() {
    8. Place Order & Confirmation
    =================================================== */
 async function placeOrder() {
+  if (!currentTableId || !currentCustomerName) {
+    alert("กรุณาเลือกโต๊ะและกรอกชื่อก่อนยืนยันการสั่งอาหารครับ");
+    openTableModal();
+    return;
+  }
+
   if (cart.length === 0) {
     alert("ไม่มีรายการอาหารในตะกร้า");
     return;
@@ -698,6 +982,9 @@ async function placeOrder() {
 
   const newOrder = {
     id: orderId,
+    tableId: currentTableId,
+    tableNumber: currentTableId,
+    customerName: currentCustomerName,
     timestamp: now.toISOString(),
     displayTime: timeFormatted,
     items: JSON.parse(JSON.stringify(cart)),
@@ -710,6 +997,9 @@ async function placeOrder() {
     const orders = await getStoredData(ORDERS_STORAGE_KEY, []);
     orders.push(newOrder);
     await setStoredData(ORDERS_STORAGE_KEY, orders);
+
+    const bc = new BroadcastChannel("lao_oi_toi_sync");
+    bc.postMessage({ type: "ORDERS_UPDATED", timestamp: Date.now() });
   } catch (err) {
     console.error("Error saving order:", err);
   }
@@ -730,7 +1020,9 @@ function showOrderSuccess(order) {
 
   if (summaryBox) {
     let itemsText = order.items.map((i) => `• ${i.name} x${i.quantity} (฿${i.unitPrice * i.quantity})`).join("<br>");
+    const guestTitle = order.customerName.startsWith("คุณ") ? order.customerName : `คุณ ${order.customerName}`;
     summaryBox.innerHTML = `
+      <div style="margin-bottom:6px; font-weight:700; color:#7A1A1A;">📍 โต๊ะ ${order.tableNumber} • ${guestTitle}</div>
       <div><strong>รายการที่สั่ง (${order.totalQuantity} ชิ้น):</strong></div>
       <div style="color:#555; margin-top:4px;">${itemsText}</div>
       <div style="margin-top:8px; border-top:1px dashed #ccc; padding-top:6px; font-weight:700;">

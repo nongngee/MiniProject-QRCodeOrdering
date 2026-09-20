@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>สถานะโต๊ะอาหาร — ลาวอ้อยต้อย</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css?v=4">
+  <link rel="stylesheet" href="admin-pages.css?v=4">
+  <link rel="icon" type="image/png" href="image/lot_logo.png">
+</head>
+<body>
+
+  <!-- ===== Header ===== -->
+  <header class="menu-header">
+    <div class="header-left">
+      <button class="btn-back" onclick="handleBack()" title="กลับหน้าหลัก" aria-label="กลับ">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <div class="header-title-group">
+        <span class="header-title">สถานะโต๊ะอาหาร</span>
+        <span class="header-subtitle">TABLE STATUS & MANAGEMENT</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <a href="../customer-webpage/index.html" target="_blank" class="btn-header-view-cust" title="เปิดดูหน้าสั่งอาหารของลูกค้า">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+          <polyline points="15 3 21 3 21 9"></polyline>
+          <line x1="10" y1="14" x2="21" y2="3"></line>
+        </svg>
+        <span>ดูหน้าลูกค้า</span>
+      </a>
+      <button type="button" class="btn-header-reset" onclick="clearAllTablesConfirm()" title="เคลียร์สถานะทุกโต๊ะให้กลับเป็นโต๊ะว่าง">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"></polyline>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        </svg>
+        <span>เคลียร์ทุกโต๊ะ</span>
+      </button>
+      <button type="button" class="btn-header-add" onclick="manualSyncAdminTables()" title="รีเฟรชข้อมูลสถานะโต๊ะ">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 4 23 10 17 10"></polyline>
+          <polyline points="1 20 1 14 7 14"></polyline>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+        </svg>
+        <span>ซิงค์โต๊ะ</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ===== Main Page Content ===== -->
+  <main class="tables-container">
+
+    <!-- Protocol Notification Banner -->
+    <div id="protocol-hint-banner" style="display: none;" class="protocol-banner">
+      💡 <strong>คำแนะนำการเชื่อมต่อ:</strong> คุณกำลังเปิดไฟล์ผ่าน <code>file://</code> หากคุณเปิดหน้าลูกค้าผ่าน Live Server ข้อมูลจะไม่ลิงก์ข้ามกันเนื่องจากระบบความปลอดภัยของเบราว์เซอร์ 
+      — <strong>วิธีแก้:</strong> ให้กดปุ่ม <strong>"ดูหน้าลูกค้า"</strong> ด้านบนขวา หรือเปิดแอดมินผ่าน <a href="http://127.0.0.1:5500/admin-webpage/admin-tables.html">http://127.0.0.1:5500/admin-webpage/admin-tables.html</a>
+    </div>
+
+    <!-- Quick Stats Overview Bar -->
+    <section class="stats-overview-grid" aria-label="สรุปภาพรวมโต๊ะ">
+      <div class="stat-card">
+        <div class="stat-icon total">🪑</div>
+        <div class="stat-info">
+          <span class="stat-val" id="stat-total-tables">15</span>
+          <span class="stat-label">โต๊ะทั้งหมดในร้าน</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon available">🟢</div>
+        <div class="stat-info">
+          <span class="stat-val available" id="stat-avail-tables">15</span>
+          <span class="stat-label">โต๊ะว่าง (พร้อมให้บริการ)</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon occupied">🔴</div>
+        <div class="stat-info">
+          <span class="stat-val occupied" id="stat-occupied-tables">0</span>
+          <span class="stat-label">กำลังใช้งาน (ไม่ว่าง)</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Floor Plan Card Container -->
+    <section class="admin-floor-card">
+      <div class="admin-floor-header">
+        <div class="admin-floor-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+          </svg>
+          <span>แผนผังโต๊ะอาหารจำลอง (15 โต๊ะ)</span>
+        </div>
+        <div class="admin-floor-legend">
+          <div class="legend-item"><span class="admin-legend-dot available"></span> โต๊ะว่าง</div>
+          <div class="legend-item"><span class="admin-legend-dot occupied"></span> กำลังใช้งาน (ไม่ว่าง)</div>
+        </div>
+      </div>
+
+      <!-- Scroll wrapper & Grid -->
+      <div class="admin-floor-scroll-wrapper">
+        <div class="admin-floor-grid" id="admin-floor-grid">
+          <!-- 14 Tables will be rendered dynamically via JS -->
+        </div>
+      </div>
+      <p style="font-size: 12px; color: var(--color-muted); text-align: center; margin-top: 4px;">
+        💡 <em>คลิกที่โต๊ะเพื่อดูข้อมูลลูกค้า หรือกดเคลียร์โต๊ะเมื่อลูกค้าเช็คบิลออกจากร้าน</em>
+      </p>
+    </section>
+
+  </main>
+
+  <!-- ===== Modal รายละเอียดโต๊ะ (Table Detail Modal) ===== -->
+  <div class="modal-overlay" id="admin-table-modal" style="display: none;" onclick="handleAdminTableModalOverlay(event)">
+    <div class="admin-table-modal-card" role="dialog" aria-modal="true">
+      <div class="admin-modal-header">
+        <h3 id="modal-table-title">รายละเอียด โต๊ะ 1</h3>
+        <button class="modal-close-btn" onclick="closeAdminTableModal()" type="button" aria-label="ปิด">✕</button>
+      </div>
+
+      <div class="admin-modal-body">
+        <!-- Status Box -->
+        <div class="table-detail-status-box">
+          <div>
+            <div class="label">สถานะปัจจุบัน</div>
+            <div class="val" id="modal-table-status-text">โต๊ะว่าง</div>
+          </div>
+          <div>
+            <div class="label">ชื่อลูกค้า</div>
+            <div class="val" id="modal-table-guest-text">-</div>
+          </div>
+          <div>
+            <div class="label">เวลาที่เข้า</div>
+            <div class="val" id="modal-table-time-text">-</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-modal-footer">
+        <button type="button" class="btn-clear-table" id="btn-admin-clear-table" onclick="handleClearCurrentTable()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>เคลียร์โต๊ะ (เปลี่ยนเป็นว่าง)</span>
+        </button>
+        <button type="button" class="btn-toggle-table" id="btn-admin-toggle-table" onclick="handleToggleCurrentTable()">
+          <span>สลับสถานะ</span>
+        </button>
+        <button type="button" class="btn-close-admin-modal" onclick="closeAdminTableModal()">ปิด</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="admin.js?v=4"></script>
+  <script>
+    requireLogin();
+  </script>
+</body>
+</html>

@@ -6,7 +6,7 @@
   <title>สั่งอาหาร — ลาวอ้อยต้อย E-SAN RESTAURANT</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="customer.css?v=3">
+  <link rel="stylesheet" href="customer.css?v=4">
   <link rel="icon" type="image/png" href="../admin-webpage/image/lot_logo.png">
 </head>
 <body>
@@ -41,6 +41,22 @@
       </div>
     </div>
   </header>
+
+  <!-- Table Status Bar (แถบระบุโต๊ะและชื่อผู้สั่ง) -->
+  <aside class="table-info-bar" id="table-info-bar">
+    <div class="table-info-container">
+      <div class="table-info-left">
+        <span class="table-pin-badge">🪑</span>
+        <div class="table-info-text-group">
+          <span class="table-current-label" id="table-current-label">ยังไม่ได้เลือกโต๊ะ</span>
+          <span class="customer-current-name" id="customer-current-name">กรุณาเลือกโต๊ะก่อนสั่งอาหาร</span>
+        </div>
+      </div>
+      <button type="button" class="btn-change-table" id="btn-change-table" onclick="openTableModal()">
+        <span>เลือก / เปลี่ยนโต๊ะ</span>
+      </button>
+    </div>
+  </aside>
 
   <!-- Protocol Notification Banner -->
   <div id="protocol-hint-banner-cust" style="display: none;" class="protocol-banner-cust">
@@ -243,7 +259,57 @@
     </div>
   </div>
 
+  <!-- ===== Modal 4: เลือกโต๊ะและกรอกชื่อ (Table Selection Floor Plan Modal) ===== -->
+  <div class="modal-backdrop table-modal-backdrop" id="table-selection-modal" style="display: none;">
+    <div class="modal-container-table" role="dialog" aria-modal="true">
+      <div class="table-modal-header">
+        <div class="table-modal-title-group">
+          <h2 class="table-modal-title">เลือกโต๊ะที่นั่งของคุณ</h2>
+          <p class="table-modal-subtitle">จิ้มเลือกโต๊ะในแผนผังร้าน และกรอกชื่อเพื่อเริ่มสั่งอาหาร</p>
+        </div>
+        <button type="button" class="btn-close-table-modal" id="btn-close-table-modal" onclick="closeTableModal()" title="ปิด">✕</button>
+      </div>
+
+      <!-- Legend -->
+      <div class="floor-plan-legend">
+        <div class="legend-item"><span class="legend-dot available"></span> โต๊ะว่าง (แตะเพื่อเลือก)</div>
+        <div class="legend-item"><span class="legend-dot selected"></span> โต๊ะที่คุณเลือก</div>
+        <div class="legend-item"><span class="legend-dot occupied"></span> กำลังใช้งาน (ไม่ว่าง)</div>
+      </div>
+
+      <!-- Floor Plan Area -->
+      <div class="floor-plan-scroll-wrapper">
+        <div class="floor-plan-grid" id="customer-floor-plan">
+          <!-- 15 Tables will be rendered dynamically via JS -->
+        </div>
+      </div>
+
+      <!-- Customer Name & Confirmation Form -->
+      <div class="table-form-section">
+        <div class="selected-table-indicator" id="selected-table-indicator">
+          <span class="indicator-label">โต๊ะที่เลือก:</span>
+          <span class="indicator-value" id="indicator-table-text">ยังไม่ได้เลือกโต๊ะ</span>
+        </div>
+
+        <div class="customer-name-field">
+          <label for="customer-name-input" class="name-label">ชื่อของคุณ / ผู้สั่งอาหาร <span class="required">*</span></label>
+          <input type="text" id="customer-name-input" class="name-input" placeholder="เช่น คุณสมชาย, ตะวัน" maxlength="30" oninput="handleCustomerNameInput()">
+        </div>
+
+        <div class="table-modal-actions">
+          <button type="button" class="btn-confirm-table" id="btn-confirm-table" onclick="confirmTableSelection()" disabled>
+            <span>เข้าสู่ขั้นตอนสั่งอาหาร</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Script -->
-  <script src="customer.js?v=3"></script>
+  <script src="customer.js?v=4"></script>
 </body>
 </html>
