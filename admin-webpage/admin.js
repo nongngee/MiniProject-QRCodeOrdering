@@ -15,7 +15,7 @@ function handleLogin(e) {
     sessionStorage.setItem("isAdminLoggedIn", "true");
     localStorage.setItem("isAdminLoggedIn", "true");
     setStoredData("isAdminLoggedIn", true);
-    window.location.href = "admin-home.html";
+    window.location.href = "index.html";
   } else {
     showError("username หรือ password ไม่ถูกต้อง");
   }
@@ -56,7 +56,7 @@ function requireLogin() {
   if (!isLogged) {
     checkLoginStatus().then((logged) => {
       if (!logged) {
-        window.location.href = "index.html";
+        window.location.href = "../index.html";
       }
     });
   }
@@ -66,11 +66,11 @@ function logout() {
   sessionStorage.removeItem("isAdminLoggedIn");
   localStorage.removeItem("isAdminLoggedIn");
   setStoredData("isAdminLoggedIn", false);
-  window.location.href = "index.html";
+  window.location.href = "../index.html";
 }
 
 function handleBack() {
-  window.location.href = "admin-home.html";
+  window.location.href = "index.html";
 }
 
 

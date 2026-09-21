@@ -1,0 +1,370 @@
+/* ===================================================
+   style.css — หน้าหลักเลือกบทบาท (Portal) | ร้านลาวอ้อยต้อย
+   =================================================== */
+
+:root {
+  --color-bg: #FAF6EE;
+  --color-primary: #7A1A1A;
+  --color-primary-dark: #5A0E0E;
+  --color-accent: #C25A1A;
+  --color-surface: #FFFFFF;
+  --color-border: #E5E0D5;
+  --color-text: #2C2C2A;
+  --color-muted: #7A7974;
+  --font-main: 'Sarabun', sans-serif;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+.portal-container {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ===== ส่วนหัวและโลโก้ ===== */
+.brand-hero {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.brand-logo-wrap {
+  margin: 0 auto 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-logo {
+  width: 84px;
+  height: 84px;
+  object-fit: contain;
+}
+
+.brand-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-primary);
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+
+.brand-tagline {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-accent);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.portal-lead {
+  font-size: 15px;
+  color: var(--color-muted);
+  max-width: 480px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* ===== กล่องเลือกบทบาท (Role Cards) ===== */
+.role-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  width: 100%;
+  margin-bottom: 28px;
+}
+
+.role-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: border-color 0.2s ease;
+}
+
+.role-card:hover {
+  border-color: #C25A1A;
+}
+
+.role-icon-box {
+  width: 68px;
+  height: 68px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  margin-bottom: 16px;
+}
+
+.role-card.customer-card .role-icon-box {
+  background: #FFF4EC;
+  border: 1px solid #FFE2CC;
+}
+
+.role-card.admin-card .role-icon-box {
+  background: #FDF0F0;
+  border: 1px solid #F8D6D6;
+}
+
+.role-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 24px;
+}
+
+.role-btn {
+  width: 100%;
+  padding: 12px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.role-card.customer-card .role-btn {
+  background: var(--color-accent);
+  color: #FFFFFF;
+}
+
+.role-card.customer-card .role-btn:hover {
+  background: #AD4E14;
+}
+
+.role-card.admin-card .role-btn {
+  background: var(--color-primary);
+  color: #FFFFFF;
+}
+
+.role-card.admin-card .role-btn:hover {
+  background: var(--color-primary-dark);
+}
+
+/* ===== ท้ายหน้า ===== */
+.portal-footer {
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-muted);
+}
+
+/* ===== Modal เข้าสู่ระบบแอดมิน ===== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.login-modal {
+  background: #FFFFFF;
+  width: 100%;
+  max-width: 380px;
+  border-radius: var(--radius-md);
+  padding: 28px 24px;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--color-border);
+}
+
+.btn-close-modal {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: #F2EFE9;
+  color: #666;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-close-modal:hover {
+  background: #E5E0D5;
+  color: #111;
+}
+
+.modal-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.modal-badge-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
+  background: #FDF0F0;
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin: 0 auto 10px;
+  border: 1px solid #F8D6D6;
+}
+
+.modal-title {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 4px;
+}
+
+.modal-subtitle {
+  font-size: 13px;
+  color: var(--color-muted);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.form-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  background: #FAF8F5;
+}
+
+.form-input:focus {
+  border-color: var(--color-primary);
+  background: #FFFFFF;
+}
+
+.error-alert {
+  background: #FDE8E8;
+  border: 1px solid #F8B4B4;
+  color: #9B1C1C;
+  font-size: 13px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  display: none;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-submit-login {
+  background: var(--color-primary);
+  color: #FFFFFF;
+  border: none;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  margin-top: 6px;
+}
+
+.btn-submit-login:hover {
+  background: var(--color-primary-dark);
+}
+
+/* ===== Responsive Mobile ===== */
+@media (max-width: 640px) {
+  .role-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .brand-title {
+    font-size: 24px;
+  }
+
+  .brand-logo {
+    width: 72px;
+    height: 72px;
+  }
+
+  .role-card {
+    padding: 24px 18px;
+  }
+
+  .role-icon-box {
+    width: 60px;
+    height: 60px;
+    font-size: 28px;
+    margin-bottom: 12px;
+  }
+
+  .role-title {
+    font-size: 18px;
+    margin-bottom: 18px;
+  }
+}
